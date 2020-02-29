@@ -40,77 +40,77 @@ Basic steps:
 3. Set the **mode** (if needed)
 
 ```{r glm_spec, echo=TRUE, message=FALSE, warning=FALSE}
-library(parsnip)
-glm_spec <- 
-  logistic_reg() %>% 
-  set_engine("glm")
+# library(parsnip)
+# glm_spec <- 
+#   logistic_reg() %>% 
+#   set_engine("glm")
 ```
 
 
 ## Split your data
 ```{r split}
-library(rsample)
-set.seed(1234)
-
-pima <- read.csv("")
-
-pima_split <- initial_split(pima, prop = 0.8, strata = Outcome)
-
-pima_training <- training(pima_split)
-pima_testing <- testing(pima_split)
+# library(rsample)
+# set.seed(1234)
+# 
+# pima <- read.csv("")
+# 
+# pima_split <- initial_split(pima, prop = 0.8, strata = Outcome)
+# 
+# pima_training <- training(pima_split)
+# pima_testing <- testing(pima_split)
 ```
 
 ```{r fit-split}
 
-fit_split <- function(formula, model, split, ...) {
-  wf <- workflows::add_model(workflows::add_formula(workflows::workflow(), formula, blueprint = hardhat::default_formula_blueprint(indicators = FALSE)), model)
-  tune::last_fit(wf, split, ...)
-}
+# fit_split <- function(formula, model, split, ...) {
+#   wf <- workflows::add_model(workflows::add_formula(workflows::workflow(), formula, blueprint = hardhat::default_formula_blueprint(indicators = FALSE)), model)
+#   tune::last_fit(wf, split, ...)
+# }
 
 ```
 
 ## Fit your model
 ```{r fit-data}
-glm_fit <- fit_split(
-  Outcome ~ ., # declare the formula
-  model = glm_spec,
-  split = pima_split,
-  metrics = metric_set(accuracy, sens, spec)
-)
-
-head(glm_fit)
+# glm_fit <- fit_split(
+#   Outcome ~ ., # declare the formula
+#   model = glm_spec,
+#   split = pima_split,
+#   metrics = metric_set(accuracy, sens, spec)
+# )
+# 
+# head(glm_fit)
 ```
 
 
 ```{r}
-glm_fit %>% 
-  unnest(.predictions)
+# glm_fit %>% 
+#   unnest(.predictions)
 ```
 
 ```{r}
-glm_fit %>% 
-  collect_predictions()
+# glm_fit %>% 
+#   collect_predictions()
 ```
 
 ```{r}
-glm_fit %>% 
-  collect_predictions() %>% 
-  count(truth = Outcome, estimate = .pred_class)
-```
-
-
-```{r}
-glm_fit %>% 
-  collect_predictions() %>% 
-  conf_mat(truth = Outcome, estimate = .pred_class)
+# glm_fit %>% 
+#   collect_predictions() %>% 
+#   count(truth = Outcome, estimate = .pred_class)
 ```
 
 
 ```{r}
-glm_fit %>% 
-  collect_predictions() %>% 
-  conf_mat(truth = Outcome, estimate = .pred_class) %>% 
-  autoplot(type = "heatmap")
+# glm_fit %>% 
+#   collect_predictions() %>% 
+#   conf_mat(truth = Outcome, estimate = .pred_class)
+```
+
+
+```{r}
+# glm_fit %>% 
+#   collect_predictions() %>% 
+#   conf_mat(truth = Outcome, estimate = .pred_class) %>% 
+#   autoplot(type = "heatmap")
            
 ```
 
@@ -127,17 +127,17 @@ In most cases, confusion matrix is enough for evaluating model performance. Howe
 ### Sensitivity
 
 ```{r}
-glm_fit %>% 
-  collect_metrics()
+# glm_fit %>% 
+#   collect_metrics()
 ```
 
 
 ### ROC Curve
 
 ```{r}
-glm_fit %>% 
-  collect_predictions() %>% 
-  roc_curve(truth = Outcome, estimate = .pred_Outcome)
+# glm_fit %>% 
+#   collect_predictions() %>% 
+#   roc_curve(truth = Outcome, estimate = .pred_Outcome)
 ```
 
 
@@ -145,21 +145,21 @@ glm_fit %>%
 That's it! What if you want to fit a decision tree instead? You just have to specify a new model:
 
 ```{r}
-dt_spec <- 
-  decision_tree() %>% 
-  set_engine("C5.0")
+# dt_spec <- 
+#   decision_tree() %>% 
+#   set_engine("C5.0")
 ```
 
 And then plug it into where we put `glm_spec` before.
 
 ```{r}
 # Doing everything in one go
-fit_split(
-  Outcome ~ ., 
-  model = dt_spec, # just change this line
-  split = pima_split,
-  metrics = metric_set(accuracy, sens, spec)) %>% 
-  collec_metrics()
+# fit_split(
+#   Outcome ~ ., 
+#   model = dt_spec, # just change this line
+#   split = pima_split,
+#   metrics = metric_set(accuracy, sens, spec)) %>% 
+#   collect_metrics()
 ```
 
 Very simple, or should I say, tidy.
