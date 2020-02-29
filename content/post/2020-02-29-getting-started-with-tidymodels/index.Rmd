@@ -43,6 +43,18 @@ knitr::opts_chunk$set(
 
 [`tidymodels`](https://github.com/tidymodels/tidymodels) is a collection of R packages (i.e. metapackage) for modeling and statistical analysis. Every package in this framework serves a particular purpose. I would not recommend reading through the documentations of all packages within the `tidymodels` framework as it could be quite overwhelming. Indeed, tidymodels give you a very different experience compared to with `caret` that contains everything within the package. So, I will introduce you to the core packages of `tidymodels` that will be used frequently. Let us start with [`parsnip`](https://tidymodels.github.io/parsnip/).
 
+## Identify the problem
+Regression or classification?
+
+In this tutorial, we will use the [Pima Indians Diabetes Database](https://www.kaggle.com/uciml/pima-indians-diabetes-database), from the UCI Machine Learning Repository. The original objective of the dataset was for predicting disease (i.e. diabetes) based on several variables.
+
+```{r data}
+library(tidyverse)
+pima <- read.csv(here::here("static", "data", "pima_diabetes.csv"))
+glimpse(pima)
+```
+
+
 ## Specify your model
 `parsnip` provides a uniform interface to specify model or algorithm that you want to fit to your data. All available models are listed [here](https://tidymodels.github.io/parsnip/articles/articles/Models.html).
 
@@ -52,45 +64,44 @@ Basic steps:
 3. Set the **mode** (if needed)
 
 ```{r glm_spec, echo=TRUE, message=FALSE, warning=FALSE}
-# library(parsnip)
-# glm_spec <- 
-#   logistic_reg() %>% 
-#   set_engine("glm")
+library(tidymodels)
+library(workflows)
+library(rsample)
+
+glm_spec <-
+  logistic_reg() %>%
+  set_engine("glm")
 ```
 
 
 ## Split your data
 ```{r split}
-# library(rsample)
-# set.seed(1234)
-# 
-# pima <- read.csv("")
-# 
-# pima_split <- initial_split(pima, prop = 0.8, strata = Outcome)
-# 
-# pima_training <- training(pima_split)
-# pima_testing <- testing(pima_split)
+set.seed(1234)
+
+pima_split <- initial_split(pima, prop = 0.8, strata = Outcome)
+pima_training <- training(pima_split)
+pima_testing <- testing(pima_split)
 ```
 
 ```{r fit-split}
 
-# fit_split <- function(formula, model, split, ...) {
-#   wf <- workflows::add_model(workflows::add_formula(workflows::workflow(), formula, blueprint = hardhat::default_formula_blueprint(indicators = FALSE)), model)
-#   tune::last_fit(wf, split, ...)
-# }
+fit_split <- function(formula, model, split, ...) {
+  wf <- workflows::add_model(workflows::add_formula(workflows::workflow(), formula, blueprint = hardhat::default_formula_blueprint(indicators = FALSE)), model)
+  tune::last_fit(wf, split, ...)
+}
 
 ```
 
 ## Fit your model
 ```{r fit-data}
-# glm_fit <- fit_split(
-#   Outcome ~ ., # declare the formula
-#   model = glm_spec,
-#   split = pima_split,
-#   metrics = metric_set(accuracy, sens, spec)
-# )
-# 
-# head(glm_fit)
+glm_fit <- fit_split(
+  Outcome ~ ., # declare the formula
+  model = glm_spec,
+  split = pima_split,
+  metrics = metric_set(accuracy, sens, spec)
+)
+
+head(glm_fit)
 ```
 
 

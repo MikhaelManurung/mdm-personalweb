@@ -29,6 +29,25 @@ projects: []
 <h2>Getting Started</h2>
 <p><a href="https://github.com/tidymodels/tidymodels"><code>tidymodels</code></a> is a collection of R packages (i.e. metapackage) for modeling and statistical analysis. Every package in this framework serves a particular purpose. I would not recommend reading through the documentations of all packages within the <code>tidymodels</code> framework as it could be quite overwhelming. Indeed, tidymodels give you a very different experience compared to with <code>caret</code> that contains everything within the package. So, I will introduce you to the core packages of <code>tidymodels</code> that will be used frequently. Let us start with <a href="https://tidymodels.github.io/parsnip/"><code>parsnip</code></a>.</p>
 </div>
+<div id="identify-the-problem" class="section level2">
+<h2>Identify the problem</h2>
+<p>Regression or classification?</p>
+<p>In this tutorial, we will use the <a href="https://www.kaggle.com/uciml/pima-indians-diabetes-database">Pima Indians Diabetes Database</a>, from the UCI Machine Learning Repository. The original objective of the dataset was for predicting disease (i.e. diabetes) based on several variables.</p>
+<pre class="r"><code>library(tidyverse)
+pima &lt;- read.csv(here::here(&quot;static&quot;, &quot;data&quot;, &quot;pima_diabetes.csv&quot;))
+glimpse(pima)</code></pre>
+<pre><code>## Observations: 768
+## Variables: 9
+## $ Pregnancies              &lt;int&gt; 6, 1, 8, 1, 0, 5, 3, 10, 2, 8, 4, 10, 10, ...
+## $ Glucose                  &lt;int&gt; 148, 85, 183, 89, 137, 116, 78, 115, 197, ...
+## $ BloodPressure            &lt;int&gt; 72, 66, 64, 66, 40, 74, 50, 0, 70, 96, 92,...
+## $ SkinThickness            &lt;int&gt; 35, 29, 0, 23, 35, 0, 32, 0, 45, 0, 0, 0, ...
+## $ Insulin                  &lt;int&gt; 0, 0, 0, 94, 168, 0, 88, 0, 543, 0, 0, 0, ...
+## $ BMI                      &lt;dbl&gt; 33.6, 26.6, 23.3, 28.1, 43.1, 25.6, 31.0, ...
+## $ DiabetesPedigreeFunction &lt;dbl&gt; 0.627, 0.351, 0.672, 0.167, 2.288, 0.201, ...
+## $ Age                      &lt;int&gt; 50, 31, 32, 21, 33, 30, 26, 29, 53, 54, 30...
+## $ Outcome                  &lt;int&gt; 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, ...</code></pre>
+</div>
 <div id="specify-your-model" class="section level2">
 <h2>Specify your model</h2>
 <p><code>parsnip</code> provides a uniform interface to specify model or algorithm that you want to fit to your data. All available models are listed <a href="https://tidymodels.github.io/parsnip/articles/articles/Models.html">here</a>.</p>
@@ -36,37 +55,40 @@ projects: []
 1. Pick a <strong>model</strong>
 2. Set the <strong>engine</strong>
 3. Set the <strong>mode</strong> (if needed)</p>
-<pre class="r"><code># library(parsnip)
-# glm_spec &lt;- 
-#   logistic_reg() %&gt;% 
-#   set_engine(&quot;glm&quot;)</code></pre>
+<pre class="r"><code>library(tidymodels)
+library(workflows)
+library(rsample)
+
+glm_spec &lt;-
+  logistic_reg() %&gt;%
+  set_engine(&quot;glm&quot;)</code></pre>
 </div>
 <div id="split-your-data" class="section level2">
 <h2>Split your data</h2>
-<pre class="r"><code># library(rsample)
-# set.seed(1234)
-# 
-# pima &lt;- read.csv(&quot;&quot;)
-# 
-# pima_split &lt;- initial_split(pima, prop = 0.8, strata = Outcome)
-# 
-# pima_training &lt;- training(pima_split)
-# pima_testing &lt;- testing(pima_split)</code></pre>
-<pre class="r"><code># fit_split &lt;- function(formula, model, split, ...) {
-#   wf &lt;- workflows::add_model(workflows::add_formula(workflows::workflow(), formula, blueprint = hardhat::default_formula_blueprint(indicators = FALSE)), model)
-#   tune::last_fit(wf, split, ...)
-# }</code></pre>
+<pre class="r"><code>set.seed(1234)
+
+pima_split &lt;- initial_split(pima, prop = 0.8, strata = Outcome)
+pima_training &lt;- training(pima_split)
+pima_testing &lt;- testing(pima_split)</code></pre>
+<pre class="r"><code>fit_split &lt;- function(formula, model, split, ...) {
+  wf &lt;- workflows::add_model(workflows::add_formula(workflows::workflow(), formula, blueprint = hardhat::default_formula_blueprint(indicators = FALSE)), model)
+  tune::last_fit(wf, split, ...)
+}</code></pre>
 </div>
 <div id="fit-your-model" class="section level2">
 <h2>Fit your model</h2>
-<pre class="r"><code># glm_fit &lt;- fit_split(
-#   Outcome ~ ., # declare the formula
-#   model = glm_spec,
-#   split = pima_split,
-#   metrics = metric_set(accuracy, sens, spec)
-# )
-# 
-# head(glm_fit)</code></pre>
+<pre class="r"><code>glm_fit &lt;- fit_split(
+  Outcome ~ ., # declare the formula
+  model = glm_spec,
+  split = pima_split,
+  metrics = metric_set(accuracy, sens, spec)
+)
+
+head(glm_fit)</code></pre>
+<pre><code>## # A tibble: 1 x 5
+##   splits            id               .metrics .notes           .predictions
+## * &lt;list&gt;            &lt;chr&gt;            &lt;list&gt;   &lt;list&gt;           &lt;list&gt;      
+## 1 &lt;split [616/152]&gt; train/test split &lt;NULL&gt;   &lt;tibble [1 x 1]&gt; &lt;NULL&gt;</code></pre>
 <pre class="r"><code># glm_fit %&gt;% 
 #   unnest(.predictions)</code></pre>
 <pre class="r"><code># glm_fit %&gt;% 
