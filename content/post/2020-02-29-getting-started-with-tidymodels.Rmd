@@ -1,0 +1,168 @@
+---
+title: "Getting Started with Tidymodels"
+author: "Mikhael Dito Manurung"
+date: '2020-02-29'
+slug: getting-started-with-tidymodels
+tags:
+- R
+- tidymodels
+- machine learning
+draft: false
+---
+
+```{r setup}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  error = FALSE,
+  message = FALSE,
+  cache = TRUE,
+  fig.width = 6,
+  fig.height = 6,
+  dpi = 320,
+  tidy.opts = list(width.cutoff = 50)
+)
+
+```
+
+
+`tidymodels` is a new R metapackage that will tidy up your machine learning workflow. Max Kuhn, the creator of the famous `caret`, also leads the development of this package. Compared to other machine learning packages in R, such as `caret` or `mlr`, `tidymodels` is still under development. However, it seems to me that the `tidymodels` framework has started to taking up shape. So, if you are still new to R and wants to learn machine learning with R, I would suggest to learn the `tidymodels`. Unfortunately, `tidymodels` tutorials are still scarce due to its very young age. I believe that this scarcity may change very soon. So, let us get started on the basic workflow of machine learning with `tidymodels`.
+
+## Getting Started
+
+[`tidymodels`](https://github.com/tidymodels/tidymodels) is a collection of R packages (i.e. metapackage) for modeling and statistical analysis. Every package in this framework serves a particular purpose. I would not recommend reading through the documentations of all packages within the `tidymodels` framework as it could be quite overwhelming. Indeed, tidymodels give you a very different experience compared to with `caret` that contains everything within the package. So, I will introduce you to the core packages of `tidymodels` that will be used frequently. Let us start with [`parsnip`](https://tidymodels.github.io/parsnip/).
+
+## Specify your model
+`parsnip` provides a uniform interface to specify model or algorithm that you want to fit to your data. All available models are listed [here](https://tidymodels.github.io/parsnip/articles/articles/Models.html).
+
+Basic steps:
+1. Pick a **model**
+2. Set the **engine**
+3. Set the **mode** (if needed)
+
+```{r glm_spec, echo=TRUE, message=FALSE, warning=FALSE}
+library(parsnip)
+glm_spec <- 
+  logistic_reg() %>% 
+  set_engine("glm")
+```
+
+
+## Split your data
+```{r split}
+library(rsample)
+set.seed(1234)
+
+pima <- read.csv("")
+
+pima_split <- initial_split(pima, prop = 0.8, strata = Outcome)
+
+pima_training <- training(pima_split)
+pima_testing <- testing(pima_split)
+```
+
+```{r fit-split}
+
+fit_split <- function(formula, model, split, ...) {
+  wf <- workflows::add_model(workflows::add_formula(workflows::workflow(), formula, blueprint = hardhat::default_formula_blueprint(indicators = FALSE)), model)
+  tune::last_fit(wf, split, ...)
+}
+
+```
+
+## Fit your model
+```{r fit-data}
+glm_fit <- fit_split(
+  Outcome ~ ., # declare the formula
+  model = glm_spec,
+  split = pima_split,
+  metrics = metric_set(accuracy, sens, spec)
+)
+
+head(glm_fit)
+```
+
+
+```{r}
+glm_fit %>% 
+  unnest(.predictions)
+```
+
+```{r}
+glm_fit %>% 
+  collect_predictions()
+```
+
+```{r}
+glm_fit %>% 
+  collect_predictions() %>% 
+  count(truth = Outcome, estimate = .pred_class)
+```
+
+
+```{r}
+glm_fit %>% 
+  collect_predictions() %>% 
+  conf_mat(truth = Outcome, estimate = .pred_class)
+```
+
+
+```{r}
+glm_fit %>% 
+  collect_predictions() %>% 
+  conf_mat(truth = Outcome, estimate = .pred_class) %>% 
+  autoplot(type = "heatmap")
+           
+```
+
+
+## Evaluate your model
+Remember, the diagonals are the correct predictions!
+
+In most cases, confusion matrix is enough for evaluating model performance. However, when you are comparing many models simultaneously, you would want the information to be compressed into a single number. 
+
+### Accuracy
+
+### Specificity
+
+### Sensitivity
+
+```{r}
+glm_fit %>% 
+  collect_metrics()
+```
+
+
+### ROC Curve
+
+```{r}
+glm_fit %>% 
+  collect_predictions() %>% 
+  roc_curve(truth = Outcome, estimate = .pred_Outcome)
+```
+
+
+
+That's it! What if you want to fit a decision tree instead? You just have to specify a new model:
+
+```{r}
+dt_spec <- 
+  decision_tree() %>% 
+  set_engine("C5.0")
+```
+
+And then plug it into where we put `glm_spec` before.
+
+```{r}
+# Doing everything in one go
+fit_split(
+  Outcome ~ ., 
+  model = dt_spec, # just change this line
+  split = pima_split,
+  metrics = metric_set(accuracy, sens, spec)) %>% 
+  collec_metrics()
+```
+
+Very simple, or should I say, tidy.
+
+In the upcoming post, I will discuss how to fit and evaluate multiple models so that we can pick the best one for our purpose. Until next time!
