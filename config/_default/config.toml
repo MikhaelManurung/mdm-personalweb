@@ -20,7 +20,8 @@ copyright = "&copy; Mikhael Dito Manurung {year}"
 ############################
 
 # Name of Academic theme folder in `themes/`.
-theme = "themes/academic"
+theme = "academic"
+
 
 # Get last modified date for content from Git?
 enableGitInfo = false
