@@ -80,4 +80,4 @@ user_groups: []
 # - Visitors
 ---
 
-I am a PhD student in the Department of Parasitology, Leiden University Medical Center. I am a medical doctor who are currently studying human immune response to parasitic diseases, such as malaria and human hookworm, in the context of controlled human infection studies. I taught myself programming in **R** and **python** so that I can analyse my **RNA-Seq** and **cytometry** data independently. I sincerely enjoy data analysis.
+I am a PhD student in the Department of Parasitology, Leiden University Medical Center. I am a medical doctor who are currently studying human immune response to parasitic diseases, such as malaria and human hookworm, in the context of controlled human infection studies. I taught myself programming in **R** and **python** so that I can analyse my **RNA-Seq** and **cytometry** data independently. I owe all of my skills to the #rstats community and MOOCs.
