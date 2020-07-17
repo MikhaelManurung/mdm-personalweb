@@ -10,11 +10,6 @@ categories:
 tags:
   - CyTOF
   - R
-output:
-  blogdown::html_page:
-    toc: yes
-    number_sections: no
-    toc_depth: 1
 ---
 
 You have spent hours or even days acquiring your samples on the CyTOF machine. You spent more time unclogging the lines instead of acquiring the samples. But that is all in the past now. You are finished with your measurements and now ready to plot your first tSNE or UMAP~~and get that Nobel prize~~. You opened R using RStudio but you do not know how to proceed, let alone loading your .FCS files. This tutorial is for you.
