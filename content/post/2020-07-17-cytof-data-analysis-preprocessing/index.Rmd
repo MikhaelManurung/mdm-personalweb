@@ -3,7 +3,7 @@ title: CyTOF Data Analysis - Preprocessing
 author: Mikhael Dito Manurung
 date: '2020-07-17'
 slug: cytof-data-analysis-preprocessing
-draft: false
+draft: no
 summary: Introduction to preprocess CyTOF .fcs files.
 categories:
   - R
