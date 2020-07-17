@@ -1,0 +1,42 @@
+---
+title: CyTOF Data Analysis - Preprocessing
+author: Mikhael Dito Manurung
+date: '2020-07-17'
+slug: cytof-data-analysis-preprocessing
+draft: false
+summary: Introduction to preprocess CyTOF .fcs files.
+categories:
+  - R
+tags:
+  - CyTOF
+  - R
+output:
+  blogdown::html_page:
+    toc: yes
+    number_sections: no
+    toc_depth: 1
+---
+
+You have spent hours or even days acquiring your samples on the CyTOF machine. You spent more time unclogging the lines instead of acquiring the samples. But that is all in the past now. You are finished with your measurements and now ready to plot your first tSNE or UMAP~~and get that Nobel prize~~. You opened R using RStudio but you do not know how to proceed, let alone loading your .FCS files. This tutorial is for you.
+
+Give outline of cytof data analysis. This post will focus on the preprocessing step
+- clean gaussian parameters
+- gate live single cells
+- compensation
+- debarcoding
+
+The learning curve for R is steep. The language is full of quirkiness. There are so many functions and packages but there is very little time to learn all of them. Here, relevant R functions will be introduced on a need-to-know basis. This tutorial is by no means comprehensive nor it aim to be such. However, I think this tutorial will be more than enough to start your journey in analysing your CyTOF data.
+
+{{% alert note %}}
+**Bottom line:** You will see this box throughout the post to indicate important caveats in the analysis workflow.
+{{% /alert %}}
+
+## Cleaning Gaussian Parameters
+- What are gaussian parameters?
+- intro to cytofclean (make proper credits)
+
+## Gating live single cells
+
+## Debarcoding
+
+## Compensation?
